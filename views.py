@@ -6,7 +6,6 @@ app = Flask(__name__)
 
 @app.route("/signup", methods=["GET","POST"])
 def signup():
-    print request.json
     insert_users(request.json['username'],request.json['password'])
     reponse = 'success'
     list = [
@@ -28,12 +27,59 @@ def login():
     ]
     return jsonify(results=list)
 
-@app.route("/lockid", methods=["GET","POST"])
-def lockid():
+@app.route("/makeadmin", methods=["GET","POST"])
+def makeadmin():
 	username= request.json['username']
 	ssid=request.json['ssid']
 	insert_admins(username,ssid)
+	list = [
+		{'param':'success'}
+	]
+	return jsonify(results=list)
 
+@app.route("/checkrights", methods=["GET","POST"])
+def checkrights():
+	username = request.json['username']
+	response = ""
+	if(is_admin(username)):
+		response = "Admin"
+	else:
+		response = "Not Admin"
+	list = [
+        {'param': response}
+    ]
+	return jsonify(results=list)
+
+@app.route("/operatelock", methods=["GET","POST"])
+def operatelock():
+	username = request.json['username']
+	ssid = request.json['ssid']
+	conf_ssid = get_ssid(username)
+	if conf_ssid==ssid:
+		response = "Open Lock"
+	else:
+		response = "Invalid SSID"
+	list = [
+        {'param': response}
+    ]
+	return jsonify(results=list)
+
+@app.route("/tempaccess", methods=["GET", "POST"])
+def addtempaccess():
+	username = request.json['username']
+	ssid = request.json['ssid']
+	action =  request.json['action']
+	response = ""
+	if action == 'add':
+		insert_tempAccess(username,ssid)
+		response = "Added user"
+	elif action == 'remove':
+		delete_tempAccess(username)
+		response = "Removed User"
+	list = [
+        {'param': response}
+    ]
+	return jsonify(results=list)
 
 if __name__ == '__main__':
     app.run(debug = True, host = '0.0.0.0')
