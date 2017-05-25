@@ -28,11 +28,12 @@ def login():
     ]
     return jsonify(results=list)
 
-@app.route("/lockid")
+@app.route("/lockid", methods=["GET","POST"])
 def lockid():
 	username= request.json['username']
 	ssid=request.json['ssid']
-	insert_locks(ssid)
+	insert_admins(username,ssid)
+
 
 if __name__ == '__main__':
     app.run(debug = True, host = '0.0.0.0')

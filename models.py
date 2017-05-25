@@ -7,17 +7,10 @@ def insert_users(username, password):
 	con.commit()
 	con.close()
 
-def insert_locks(ssid):
-	con = sql.connect("database.db")
-	cur = con.cursor()
-	cur.execute("INSERT INTO locks(ssid)", ssid)
-	con.commit()
-	con.close()
-
 def insert_admins(username,ssid):
 	con = sql.connect("database.db")
 	cur = con.cursor()
-	cur.execute("INSERT INTO admins",(username,ssid))
+	cur.execute("INSERT INTO admins (username,ssid) VALUES (?,?)",(username,ssid))
 	con.commit()
 	con.close()
 
