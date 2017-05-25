@@ -21,7 +21,7 @@ def homepage(username):
     return render_template("homepage.html",username=username)
 
 @app.route("/login")
-def login():
+def login(): 
     return render_template("login.html")
 
 @app.route("/adding/<username>", methods=["GET","POST"])
@@ -30,5 +30,8 @@ def adding(username):
     password=request.form['password']
     return redirect("/home",username=username) # add a route to the signed in homepage
 
-
+@app.route("/lockid")
+ssid=request.json['ssid']
+def lockid(ssid):
+        insert_locks(ssid)
     		
