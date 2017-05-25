@@ -14,11 +14,6 @@ def signup():
     ]
     return jsonify(results=list)
 
-	
-@app.route("/home/<username>")
-def homepage(username):
-    return render_template("homepage.html",username=username)
-
 @app.route("/login", methods=["GET","POST"])
 def login():
     username = request.json['username']
@@ -33,14 +28,9 @@ def login():
     ]
     return jsonify(results=list)
 
-@app.route("/adding/<username>", methods=["GET","POST"])
-def adding(username):
-    username = request.form['username']
-    password=request.form['password']
-    return redirect("/home",username=username) # add a route to the signed in homepage
-
 @app.route("/lockid")
 def lockid():
+	username= request.json['username']
 	ssid=request.json['ssid']
 	insert_locks(ssid)
 
