@@ -1,13 +1,16 @@
-#from app import app
 from flask import render_template, redirect, request, flash, g, session, url_for, jsonify, Flask
 from models import *
+from servo import *
 app = Flask(__name__)
 @app.route("/", methods=["GET","POST"])
 
 @app.route("/signup", methods=["GET","POST"])
 def signup():
     insert_users(request.json['username'],request.json['password'])
-    reponse = 'success'
+    if is_user(username):
+    	reponse = "Choose a different username"
+    else:
+    	reponse = "Success"
     list = [
         {'param': reponse}
     ]
@@ -18,10 +21,17 @@ def login():
     username = request.json['username']
     password = request.json['password']
     conf_pass = query(username)
+
+    if not is_user(username):
+    	response = "Not a User"
+    	list = [
+        {'param': response}
+    	]
+    	return jsonify(results=list)
     if conf_pass==password:
     	reponse = "Grant Access"
     else:
-    	reponse = "Incorrect Username or Password"
+    	reponse = "Incorrect Password"
     list = [
         {'param': reponse}
     ]
@@ -31,9 +41,22 @@ def login():
 def makeadmin():
 	username= request.json['username']
 	ssid=request.json['ssid']
-	insert_admins(username,ssid)
+	if is_user(username):
+		response  = insert_admins(username,ssid)
+	else:
+		response = "User Not Found"
 	list = [
-		{'param':'success'}
+		{'param':response}
+	]
+	return jsonify(results=list)
+
+@app.route("/removeadmin", methods=["GET","POST"])
+def removeadmin():
+	username = request.json['username']
+	ssid = request.json['ssid']
+	response = remove_admin(username, ssid)
+	list = [ 
+		{'param':response}
 	]
 	return jsonify(results=list)
 
@@ -54,12 +77,17 @@ def checkrights():
 def operatelock():
 	username = request.json['username']
 	ssid = request.json['ssid']
+	action = request.json['action']
 	conf_ssid = get_ssid(username)
 	response = ""
 	if conf_ssid==ssid:
-		response = "Open Lock"
+		response = "Operate Lock"
 	else:
 		response = "Invalid SSID"
+	if action == "open":
+		open()
+	elif action = "close":
+		close()
 	list = [
         {'param': response}
     ]
@@ -71,8 +99,10 @@ def tempaccess():
 	ssid = request.json['ssid']
 	action =  request.json['action']
 	password = query(username)
-	print password
-	if password == 'None':
+	list = [
+        {'param': response}
+    ]
+	if not is_user():
 		response = "Invalid User"
 		return jsonify(results=list) 
 	response = ""
@@ -81,7 +111,6 @@ def tempaccess():
 		response = "Added user"
 	elif action == 'remove':
 		delete_tempAccess(username)
-		print "nice"
 		response = "Removed User"
 	list = [
         {'param': response}

@@ -21,14 +21,40 @@ def insert_admins(username,ssid):
         for row in rows:
             if row["ssid"]==ssid:
                 flag = False
+            if row["user"]==username:
+                message = "Already Admin"
+                return message
         if (flag):
-        cur.execute("INSERT INTO admins (user,ssid) VALUES (?,?)",(username,ssid))
-        message = "New Admin"
+            message = "New Admin"
         else:
-        message = "No New"
+            message = "No New"
+    cur.execute("INSERT INTO admins (user,ssid) VALUES (?,?)",(username,ssid))
     con.commit()
     con.close()
-    return(message)
+    return message
+
+def remove_admin(username, ssid):
+    con = sql.connect("database.db")
+    flag = True
+    message = ""
+    with con:
+        con.row_factory = sql.Row
+
+        cur = con.cursor()
+        cur.execute("SELECT * FROM admins")
+
+        rows = cur.fetchall()
+        for row in rows:
+            if row["ssid"]==ssid and row["user"]==username:
+                message = "Deleted Admin"
+                cur.execute("DELETE FROM admins WHERE user=?",(username,))
+                flag = False
+                print flag
+    if flag:
+        message = "Admin Not Found"
+    con.commit()
+    con.close()
+    return message
 
 def insert_tempAccess(username,ssid):
     con = sql.connect("database.db")
@@ -92,3 +118,24 @@ def get_ssid(username):
                 if row["tempuser"]==username:
                     ssid = row["tempssid"]
         return ssid
+
+def register_lock(ssid):
+    con = sql.connect("database.db") 
+    cur = con.cursor()
+    cur.execute("INSERT INTO locks (ssid) VALUES (?)",(ssid))
+    con.commit()
+    con.close()
+
+def is_user(username):
+    con = sql.connect("database.db")
+    with con:
+        con.row_factory = sql.Row
+
+        cur = con.cursor()
+        cur.execute("SELECT * FROM users")
+
+        rows = cur.fetchall()
+        for row in rows:
+            if row["username"]==username:
+                return True
+    return False
