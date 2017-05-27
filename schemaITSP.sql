@@ -9,16 +9,15 @@ ssid text primary key);
 
 drop table if exists admins;
 create table admins(
-id integer primary key autoincrement,
-username text,
-ssid text,
-foreign key (username) REFERENCES users,
-foreign key (ssid) REFERENCES locks);
+user text,
+ssid text primary key,
+foreign key (user) REFERENCES users(username));
 
 drop table if exists tempAccess;
 create table tempAccess(
-Time datetime null,	
 id integer primary key autoincrement,
-username text,
-foreign key (username) REFERENCES users);
+tempuser text,
+tempssid text,
+foreign key (tempuser) REFERENCES users(username)
+foreign key (tempssid) REFERENCES admins(ssid));
 
