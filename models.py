@@ -9,7 +9,7 @@ def insert_users(username, password):
 
 def insert_admins(username,ssid):
 	con = sql.connect("database.db")
-        flag = True
+    flag = True
 	ssidd = ""
 	with con:
 		con.row_factory = sql.Row
@@ -24,11 +24,11 @@ def insert_admins(username,ssid):
         if (flag):
 	    cur.execute("INSERT INTO admins (user,ssid) VALUES (?,?)",(username,ssid))
 	    message = "New Admin"
-	else:
+	    else:
 	    message = "No New"
-	con.commit()
+    con.commit()
 	con.close()
-        return(message)
+    return(message)
 
 def insert_tempAccess(username,ssid):
 	con = sql.connect("database.db")
