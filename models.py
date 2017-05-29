@@ -24,7 +24,7 @@ def insert_admins(username,ssid):
                 flag = False
             	if row["user"]==username:
                 	message = "Already Admin"
-                return message
+                	return message
         if (flag):
             message = "New Admin"
         else:
