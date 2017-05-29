@@ -132,7 +132,7 @@ def tempaccess():
         {'param': response}
     ]
 	elif datetime.today()>end_time:
-		response = response "The end time is from the past."
+		response = "The end time is from the past."
 		return jsonify(results=list)
 	response = insert_tempAccess(username,ssid,start_time.isoformat(),end_time.isoformat())
 	list = [
