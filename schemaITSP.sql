@@ -18,6 +18,8 @@ create table tempAccess(
 id integer primary key autoincrement,
 tempuser text,
 tempssid text,
+startdate text,
+enddate text,
 foreign key (tempuser) REFERENCES users(username)
 foreign key (tempssid) REFERENCES admins(ssid));
 

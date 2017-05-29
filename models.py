@@ -1,4 +1,5 @@
 import sqlite3 as sql
+from datetime import datetime
 
 def insert_users(username, password):
     con = sql.connect("database.db") 
@@ -56,12 +57,13 @@ def remove_admin(username, ssid):
     con.close()
     return message
 
-def insert_tempAccess(username,ssid):
+def insert_tempAccess(username,ssid,start_date, end_date):
     con = sql.connect("database.db")
     cur = con.cursor()
-    cur.execute("INSERT INTO tempAccess (tempuser,tempssid) VALUES (?,?)",(username,ssid))
+    cur.execute("INSERT INTO tempAccess (tempuser,tempssid,startdate,enddate) VALUES (?,?,?,?)",(username,ssid,start_date,end_date))
     con.commit()
     con.close()
+    return "Success"
 
 def delete_tempAccess(username):
     con = sql.connect("database.db")
@@ -83,6 +85,8 @@ def query(username):
         for row in rows:
             if row["username"] == username:
                 return row["password"]
+    con.commit()
+    con.close()
 
 def is_admin(username):
     con = sql.connect("database.db")
@@ -97,6 +101,8 @@ def is_admin(username):
             if row["user"]==username:
                 return True
         return False
+    con.commit()
+    con.close()
 
 def get_ssid(username):
     con = sql.connect("database.db")
@@ -117,7 +123,9 @@ def get_ssid(username):
             for row in rows:
                 if row["tempuser"]==username:
                     ssid = row["tempssid"]
-        return ssid
+    con.commit()
+    con.close()
+    return ssid
 
 def register_lock(ssid):
     con = sql.connect("database.db") 
@@ -138,4 +146,24 @@ def is_user(username):
         for row in rows:
             if row["username"]==username:
                 return True
+    con.commit()
+    con.close()
     return False
+
+def allowance(username):
+	con = sql.connect("database.db")
+	with con:
+		con.row_factory = sql.Row
+
+        cur = con.cursor()
+        cur.execute("SELECT * FROM admins")
+
+        rows = cur.fetchall()
+        for row in rows:
+        	if row["username"]==username:
+        		return datetime.today().isoformat()<row['enddate']
+        		con.commit()
+        		con.close()
+	return "User not found"
+	con.commit()
+	con.close()

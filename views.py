@@ -1,18 +1,20 @@
 from flask import render_template, redirect, request, flash, g, session, url_for, jsonify, Flask
 from models import *
 from servo import *
+from datetime import datetime,date
 app = Flask(__name__)
 @app.route("/", methods=["GET","POST"])
 
 @app.route("/signup", methods=["GET","POST"])
 def signup():
-    insert_users(request.json['username'],request.json['password'])
+    username = request.json['username']
     if is_user(username):
-    	reponse = "Choose a different username"
+    	response = "Choose a different username"
+    	insert_users(request.json['username'],request.json['password'])
     else:
-    	reponse = "Success"
+    	response = "Success"
     list = [
-        {'param': reponse}
+        {'param': response}
     ]
     return jsonify(results=list)
 
@@ -54,7 +56,10 @@ def makeadmin():
 def removeadmin():
 	username = request.json['username']
 	ssid = request.json['ssid']
-	response = remove_admin(username, ssid)
+	if is_user(username):
+		response  = remove_admins(username,ssid)
+	else:
+		response = "User Not Found"
 	list = [ 
 		{'param':response}
 	]
@@ -80,41 +85,72 @@ def operatelock():
 	action = request.json['action']
 	conf_ssid = get_ssid(username)
 	response = ""
-	if conf_ssid==ssid:
+	if is_admin(username) and conf_ssid==ssid:
 		response = "Operate Lock"
+		if action == "open":
+			pass
+		elif action == "close":
+			pass
 	else:
-		response = "Invalid SSID"
-	if action == "open":
-		open()
-	elif action = "close":
-		close()
+		print allowance(username)
+		if allowance(username) and conf_ssid==ssid:
+			response = "Operate Lock"
+			if action == "open":
+				pass
+			elif action == "close":
+				pass
+		else:
+			response  = "Invalid Username/SSID"
 	list = [
-        {'param': response}
-    ]
+		{'param':response}
+		]
 	return jsonify(results=list)
 
 @app.route("/tempaccess", methods=["GET", "POST"])
 def tempaccess():
 	username = request.json['username']
 	ssid = request.json['ssid']
-	action =  request.json['action']
 	password = query(username)
-	list = [
-        {'param': response}
-    ]
-	if not is_user():
-		response = "Invalid User"
-		return jsonify(results=list) 
+	start_time = datetime(request.json['start-year'],request.json['start-month'],request.json['start-date'],request.json['start-hours'],request.json['start-minute'])
+	end_time = datetime(request.json['end-year'],request.json['end-month'],request.json['end-date'],request.json['end-hours'],request.json['end-minute'])
+	start_date = date(request.json['start-year'],request.json['start-month'],request.json['start-date'])
+	end_date = date(request.json['end-year'],request.json['end-month'],request.json['end-date'])
+	start_minute = request.json['start-minute']
+	start_hour = request.json['start-hours']
+	end_hour = request.json['end-hours']
+	end_minute = request.json['end-minute']
 	response = ""
-	if action == 'add':
-		insert_tempAccess(username,ssid)
-		response = "Added user"
-	elif action == 'remove':
-		delete_tempAccess(username)
-		response = "Removed User"
+	if not is_user(username):
+		response = "Invalid Username"
+		list = [
+        {'param': response}
+    ]
+		return jsonify(results=list)
+	elif start_time>end_time:
+		response = "Invalid Time Span!" 
+		list = [
+        {'param': response}
+    ]
+	elif datetime.today()>end_time:
+		response = response "The end time is from the past."
+		return jsonify(results=list)
+	response = insert_tempAccess(username,ssid,start_time.isoformat(),end_time.isoformat())
 	list = [
         {'param': response}
     ]
+	return jsonify(results=list)
+
+@app.route("/validuser", methods=["GET","POST"])
+def valid_user():
+	username = request.json['username']
+	response = ""
+	if is_user(username):
+		response = "OK"
+	else:
+		response = "Not Ok"
+	list = [
+	{'param':response}
+	]
 	return jsonify(results=list)
 
 if __name__ == '__main__':
