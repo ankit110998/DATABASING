@@ -10,9 +10,10 @@ def signup():
     username = request.json['username']
     if is_user(username):
     	response = "Choose a different username"
-    	insert_users(request.json['username'],request.json['password'])
+    	
     else:
     	response = "Success"
+    	insert_users(request.json['username'],request.json['password'])
     list = [
         {'param': response}
     ]
