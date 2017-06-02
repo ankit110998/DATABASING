@@ -91,17 +91,17 @@ def operatelock():
 	if is_admin(username) and conf_ssid==ssid:
 		response = "Operate Lock"
 		if action == "open":
-			pass
+			open()
 		elif action == "close":
-			pass
+			close()
 	else:
 		print allowance(username,ssid)
 		if allowance(username,ssid) and conf_ssid==ssid:
 			response = "Operate Lock"
 			if action == "open":
-				pass
+				open()
 			elif action == "close":
-				pass
+				close()
 		else:
 			response  = "Invalid Username/SSID"
 	list = [
