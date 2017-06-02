@@ -11,7 +11,7 @@ def insert_users(username, password):
 def insert_admins(username,ssid):
     con = sql.connect("database.db")
     flag = True
-    ssidd = ""
+    message = ""
     with con:
         con.row_factory = sql.Row
 
@@ -22,14 +22,11 @@ def insert_admins(username,ssid):
         for row in rows:
             if row["ssid"]==ssid:
                 flag = False
-            	if row["user"]==username:
-                	message = "Already Admin"
-                	return message
-        if (flag):
-            message = "New Admin"
-        else:
-            message = "No New"
-    cur.execute("INSERT INTO admins (user,ssid) VALUES (?,?)",(username,ssid))
+                if row["user"]==username:
+            print row["user"]
+                    message = "Already Admin"
+    if not message=="Already Admin":        
+        cur.execute("INSERT INTO admins (user,ssid) VALUES (?,?)",(username,ssid))
     con.commit()
     con.close()
     return message
@@ -74,6 +71,7 @@ def delete_tempAccess(username):
 
 def query(username):
     con = sql.connect("database.db")
+    passo = "n"
     with con:
         con.row_factory = sql.Row
        
@@ -84,12 +82,14 @@ def query(username):
 
         for row in rows:
             if row["username"] == username:
-                return row["password"]
+        passo =  row["password"]
     con.commit()
     con.close()
+    return passo
 
 def is_admin(username):
     con = sql.connect("database.db")
+    flag = False
     with con:
         con.row_factory = sql.Row
 
@@ -99,10 +99,11 @@ def is_admin(username):
         rows = cur.fetchall()
         for row in rows:
             if row["user"]==username:
-                return True
-        return False
+        flag =  True
     con.commit()
     con.close()
+    return flag
+    
 
 def get_ssid(username):
     con = sql.connect("database.db")
@@ -136,6 +137,7 @@ def register_lock(ssid):
 
 def is_user(username):
     con = sql.connect("database.db")
+    flag = False
     with con:
         con.row_factory = sql.Row
 
@@ -145,25 +147,26 @@ def is_user(username):
         rows = cur.fetchall()
         for row in rows:
             if row["username"]==username:
-                return True
+        flag = True
     con.commit()
     con.close()
-    return False
+    return flag
 
-def allowance(username):
-	con = sql.connect("database.db")
-	with con:
-		con.row_factory = sql.Row
+def allowance(username, ssid):
+    con = sql.connect("database.db")
+    with con:
+        con.row_factory = sql.Row
 
         cur = con.cursor()
-        cur.execute("SELECT * FROM admins")
+        cur.execute("SELECT * FROM tempAccess")
 
         rows = cur.fetchall()
         for row in rows:
-        	if row["username"]==username:
-        		return datetime.today().isoformat()<row['enddate']
-        		con.commit()
-        		con.close()
-	return "User not found"
-	con.commit()
-	con.close()
+            if row["tempuser"]==username and row["tempssid"]==ssid:
+            con.commit()
+                con.close()
+                return datetime.today().isoformat()<row['enddate']
+        con.commit()
+    con.close()     
+    return "User not found"
+    
