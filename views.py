@@ -45,12 +45,14 @@ def makeadmin():
 	username= request.json['username']
 	ssid=request.json['ssid']
 	if is_user(username):
+		print is_user(username)
 		response  = insert_admins(username,ssid)
 	else:
 		response = "User Not Found"
 	list = [
 		{'param':response}
 	]
+	print response
 	return jsonify(results=list)
 
 @app.route("/removeadmin", methods=["GET","POST"])
@@ -58,7 +60,7 @@ def removeadmin():
 	username = request.json['username']
 	ssid = request.json['ssid']
 	if is_user(username):
-		response  = remove_admins(username,ssid)
+		response  = remove_admin(username,ssid)
 	else:
 		response = "User Not Found"
 	list = [ 
@@ -93,8 +95,8 @@ def operatelock():
 		elif action == "close":
 			pass
 	else:
-		print allowance(username)
-		if allowance(username) and conf_ssid==ssid:
+		print allowance(username,ssid)
+		if allowance(username,ssid) and conf_ssid==ssid:
 			response = "Operate Lock"
 			if action == "open":
 				pass
@@ -128,19 +130,25 @@ def tempaccess():
         {'param': response}
     ]
 		return jsonify(results=list)
-	elif start_time>end_time:
+	if start_time>end_time:
 		response = "Invalid Time Span!" 
 		list = [
         {'param': response}
     ]
+		return jsonify(results=list)
 	elif datetime.today()>end_time:
+		print end_time
 		response = "The end time is from the past."
+		list = [
+        {'param': response}
+    ]
 		return jsonify(results=list)
 	print "Hello World"
 	response = insert_tempAccess(username,ssid,start_time.isoformat(),end_time.isoformat())
 	list = [
         {'param': response}
     ]
+	print response
 	return jsonify(results=list)
 
 @app.route("/validuser", methods=["GET","POST"])
