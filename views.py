@@ -121,6 +121,7 @@ def tempaccess():
 	end_hour = request.json['end-hours']
 	end_minute = request.json['end-minute']
 	response = ""
+	print start_time>end_time
 	if not is_user(username):
 		response = "Invalid Username"
 		list = [
@@ -135,6 +136,7 @@ def tempaccess():
 	elif datetime.today()>end_time:
 		response = "The end time is from the past."
 		return jsonify(results=list)
+	print "Hello World"
 	response = insert_tempAccess(username,ssid,start_time.isoformat(),end_time.isoformat())
 	list = [
         {'param': response}
